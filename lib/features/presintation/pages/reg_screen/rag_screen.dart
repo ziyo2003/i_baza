@@ -65,7 +65,7 @@ class _RagScreenState extends State<RagScreen> {
             TextField(
               controller: _passwordController,
               decoration: InputDecoration(
-                labelText: "+998 ",
+                suffixIcon: Text("+998 "),
                 hintText: '99 123 45 67',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),

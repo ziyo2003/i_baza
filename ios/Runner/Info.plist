@@ -45,5 +45,21 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>The image Picker Plagin required</string>
+	<key>NSMicrophoneUsageDescription</key>
+    	<string>The micraphone required</string>
+    <key>NSCameraUsageDescription</key>
+        <string>The Camera required</string>
+    <key>NSAppleMusicUsageDescription</key>
+    <string>Explain why your app uses music</string>
+    <key>UISupportsDocumentBrowser</key>
+    <true/>
+    <key>UIBackgroundModes</key>
+    <array>
+       <string>fetch</string>
+       <string>remote-notification</string>
+    </array>
+
 </dict>
 </plist>

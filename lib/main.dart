@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:i_baza/core/adaptor/hive_type_adaptor.dart';
 import 'package:i_baza/core/data_base/objectBox.dart';
 import 'package:i_baza/features/presintation/pages/login_screen/login_screen.dart';
+import 'package:i_baza/features/presintation/pages/profile/profile.dart';
 import 'core/injector/setup_locator/setup_locator.dart';
 import 'core/injector/stage_repository/storage_repository.dart';
 
@@ -34,7 +35,7 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      home: ProfileScreen(),
     );
   }
 }

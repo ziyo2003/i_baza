@@ -1,7 +1,10 @@
+
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:i_baza/features/presintation/pages/reg_screen/rag_screen.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../reg_screen/rag3_screen.dart'; // Ensure you have flutter_svg package in your pubspec.yaml
 
@@ -13,6 +16,19 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
+  File? avatar;
+  Future<void> pickerAvatar() async {
+    ImagePicker imagePicker = ImagePicker();
+    final file = await imagePicker.pickImage(source: ImageSource.gallery);
+
+    if (file != null) {
+      setState(() {
+        avatar = File.fromUri(Uri.file(file.path));
+      });
+    }
+  }
+
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
@@ -32,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(height: 60,),
             const SizedBox(height: 96),
             Center(child: SvgPicture.asset('assets/icons/svg/login_screen_icon.svg')),
             const SizedBox(height: 48),
