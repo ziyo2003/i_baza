@@ -2,9 +2,11 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hive/hive.dart';
 import 'package:i_baza/features/presintation/pages/profile/profile_edit.dart';
 import 'package:i_baza/features/presintation/pages/reg_screen/rag_screen.dart';
 import 'package:image_picker/image_picker.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,7 +17,38 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   File? avatar;
+  String _name = '';
+  String _location = '';
 
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+
+
+  Future<void> _loadProfileData() async {
+    // Ensure that Hive is initialized and the boxes are opened elsewhere in your code
+    final nameBox = Hive.box("profile_name");
+    final locationBox = Hive.box("profile_location");
+    final name = await nameBox.get(1, defaultValue: 'Name not set');
+    final location = await locationBox.get(1, defaultValue: 'Location not set');
+    final avatarBox = Hive.box("profile_avatar");
+    final avatarPath = avatarBox.get('avatar_path');
+    if (avatarPath != null) {
+      setState(() {
+        avatar = File(avatarPath);
+      });
+    }
+
+
+
+    setState(() {
+      _name = name;
+      _location = location;
+    });
+  }
   Future<void> pickerAvatar() async {
     ImagePicker imagePicker = ImagePicker();
     final file = await imagePicker.pickImage(source: ImageSource.gallery);
@@ -26,26 +59,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     }
   }
-
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _isPasswordVisible = false;
-
-  @override
-  void dispose() {
-    _phoneController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _passwordController.addListener(() {
-      setState(() {}); // Call setState to rebuild the widget with the new icon
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,23 +88,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 Positioned(
                   top: 16,
-                  child: GestureDetector(
-                    onTap: () {
-                      pickerAvatar();
-                    },
-                    child: Container(
-                      height: 70,
-                      width: 70,
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.transparent,
-                        border: Border.all(width: 1, color: Colors.grey),
-                      ),
-                      child: avatar == null
-                          ? const Icon(Icons.person, size: 30, color: Colors.grey)
-                          : Image.file(avatar!, fit: BoxFit.cover,),
+                  child: Container(
+                    height: 70,
+                    width: 70,
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.transparent,
+                      border: Border.all(width: 1, color: Colors.grey),
                     ),
+                    child: avatar == null
+                        ? const Icon(Icons.person, size: 30, color: Colors.grey)
+                        : Image.file(avatar!, fit: BoxFit.cover,),
                   ),
                 ),
                 Positioned(
@@ -106,19 +114,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: SvgPicture.asset('assets/icons/svg/profile_icon.svg'),
                   ),
                 ),
-                const Positioned(
+                 Positioned(
                   top: 108,
                   left: 16,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('F.I.Sh',style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color:Colors.grey)),
-                      Text('Shohrux Shavqiyev',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600)),
+                      Text('F.I.Sh', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey)),
+                      Text(_name,style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
                       SizedBox(height: 16,),
-                      Text('Manzilingiz',style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: Colors.grey)),
-                      Text('Toshkent shahar, Mirobod tumani\nFidokor ko‘chasi',style: TextStyle(fontSize: 17,fontWeight: FontWeight.w600)),
-                      // Add more Text widgets as needed
-                    ],
+                      Text('Manzilingiz', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey)),
+                      Text(_location, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                  // Add more Text widgets as needed
+                  ],
                   ),
                 ),
               ],

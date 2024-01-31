@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hive/hive.dart';
 import 'package:i_baza/features/presintation/pages/reg_screen/rag_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -14,6 +15,33 @@ class ProfileEditScreen extends StatefulWidget {
 
 class _ProfileEditScreenState extends State<ProfileEditScreen> {
   File? avatar;
+  final _name = Hive.box("profile_name");
+  final _location = Hive.box("profile_location");
+  final avatarBox = Hive.box('profile_avatar');
+
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    final name = await _name.get(1) ?? '';
+    final location = await _location.get(1) ?? '';
+    final avatarPath = await avatarBox.get('avatar_path');
+
+    if (avatarPath != null) {
+      avatar = File(avatarPath);
+    }
+
+    setState(() {
+      _nameController.text = name;
+      _locationController.text = location;
+    });
+  }
 
   Future<void> pickerAvatar() async {
     ImagePicker imagePicker = ImagePicker();
@@ -21,29 +49,18 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
     if (file != null) {
       setState(() {
-        avatar = File.fromUri(Uri.file(file.path));
+        avatar = File(file.path);
       });
+      await avatarBox.put('avatar_path', file.path);
     }
   }
 
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-
-
-  @override
-  void dispose() {
-    _phoneController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+  void _saveProfileData() {
+    _name.put(1, _nameController.text);
+    _location.put(1, _locationController.text);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _passwordController.addListener(() {
-      setState(() {}); // Call setState to rebuild the widget with the new icon
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +85,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               children: [
 
                 SizedBox(
-                  height: 348,
+                  height: 370,
                   width: double.infinity,
                   child: Material(
                     borderRadius: BorderRadius.circular(16),
@@ -96,53 +113,67 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                     ),
                   ),
                 ),
+
                 Positioned(
-                  top: 132,
+                  top: 120,
                     left: 16,
                     right: 16,
-                    child:
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                         Text('F.I.Sh',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                     ),
                     TextField(
+                      controller: _nameController,
                       decoration: InputDecoration(
-                        labelText: 'F.I.Sh',
+                        hintText: "edit name",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
+                             ),
+                           ),
+                        ),
+                      ],
+                    ),
+                ),
+
+                Positioned(
+                  bottom: 12,
+                  // left: 16,
+                  // right: 16,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Manzilingiz',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Container(
+                        constraints: BoxConstraints.tightFor(width: 340.0, height: 120.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: TextField(
+                          controller: _locationController,
+                          maxLines: null,
+                          expands: true,
+                          decoration: InputDecoration(
+
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(10),
+                          ),
                         ),
                       ),
-                      // keyboardType: TextInputType.text,
-                    ),
-                ),
-                Positioned(
-                    top: 212,
-                    bottom: 12,
-                    left: 16,
-                    right: 16,
-                    child: Container(
-                  constraints: BoxConstraints.tightFor(width: 303.0, height: 120.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey), // Border color
-                    borderRadius: BorderRadius.circular(8.0), // Border radius
+                    ],
                   ),
-                  child: const TextField(
-                    maxLines: null, // Allows the text field to expand vertically
-                    expands: true, // Expands the text field to fill the container
-                    decoration: InputDecoration(
-                      labelText: 'Manzilingiz',
-                      border: InputBorder.none, // Removes the underline of the text field
-                      contentPadding: EdgeInsets.all(10), // Padding inside the text field
-                    ),
-                  ),
-                )
-
                 ),
-
-              ],
-            ),
+               ]
+              ),
             const SizedBox(height: 300),
             ElevatedButton(
               onPressed: () {
-                // Navigator.of(context).push(
-                //   MaterialPageRoute(builder: (context) => RagScreen()),
-                // );
+                _saveProfileData();
               },
               child: Text('Saqlash',style: TextStyle(color: Colors.black)),
               style: ElevatedButton.styleFrom(
